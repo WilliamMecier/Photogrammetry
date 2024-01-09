@@ -1,0 +1,38 @@
+#This script was developed by William Mecier in Python
+#The purpose of extracting frames from a video file for use in photogrammetry
+
+
+import cv2
+import os
+
+def extract_frames(video_path, save_path, interval=3):
+    # Capture the video
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return
+
+    # Get video frame rate
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    # Frame counter
+    count = 0
+
+    while True:
+        # Read a frame
+        success, frame = cap.read()
+        if not success:
+            break  # Reached end of video
+
+        # Check if it's time to save a frame
+        if count % (fps * interval) == 0:
+            frame_id = f'a{count//(fps*interval):06d}'  # Format frame ID
+            cv2.imwrite(os.path.join(save_path, f'{frame_id}.jpg'), frame)
+            print(f'Saved {frame_id}.jpg')
+
+        count += 1
+
+    cap.release()
+
+# Example usage
+extract_frames('path/to/your/video.mp4', 'path/to/save/images/')
